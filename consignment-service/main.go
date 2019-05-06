@@ -85,10 +85,11 @@ func main() {
         micro.Name("go.micro.srv.consignment"),
         micro.Version("latest"),
     )
-
-    vesselClient := vesselProto.NewVesselServiceClient("go.micro.srv.vessel", srv.Client())
     // Init will parse the command line flags.
     srv.Init()
+
+    vesselClient := vesselProto.NewVesselServiceClient("go.micro.srv.vessel", srv.Client())
+    
     // Register handler
     pb.RegisterShippingServiceHandler(srv.Server(), &service{repo, vesselClient})
     // Run the server
