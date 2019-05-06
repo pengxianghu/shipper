@@ -1,75 +1,98 @@
 // consignment-service/main.go
 package main
 
-import (  
+import (  // Import the generated protobuf code
+    "fmt"
     "log"
-    "net"
 
-    // 导入生成的 protobuf 代码
     pb "github.com/pengxianghu/shipper/consignment-service/proto/consignment"
+    vesselProto "github.com/pengxianghu/shipper/vessel-service/proto/vessel"
+    micro "github.com/micro/go-micro"
     "golang.org/x/net/context"
-    "google.golang.org/grpc"
-    "google.golang.org/grpc/reflection"
 )
 
-const (  
-    port = ":50051"
-)
-
-type IRepository interface {  
+type Repository interface {  
     Create(*pb.Consignment) (*pb.Consignment, error)
     GetAll() []*pb.Consignment
 }
-// Repository - 一个模拟数据存储的虚拟仓库，以后我们会替换成真实的数据仓库
-type Repository struct {  
+
+// Repository - Dummy repository, this simulates the use of a datastore
+// of some kind. We'll replace this with a real implementation later on.
+type ConsignmentRepository struct {  
     consignments []*pb.Consignment
 }
 
-func (repo *Repository) Create(consignment *pb.Consignment) (*pb.Consignment, error) {  
+func (repo *ConsignmentRepository) Create(consignment *pb.Consignment) (*pb.Consignment, error) {  
     updated := append(repo.consignments, consignment)
     repo.consignments = updated
     return consignment, nil
 }
 
-func (repo *Repository) GetAll() []*pb.Consignment {  
+func (repo *ConsignmentRepository) GetAll() []*pb.Consignment {  
     return repo.consignments
 }
 
-// 服务需要实现所有在 protobuf 里定义的方法。
-// 你可以参考 protobuf 生成的 go 文件中的接口信息。
+// Service should implement all of the methods to satisfy the service
+// we defined in our protobuf definition. You can check the interface
+// in the generated code itself for the exact method signatures etc
+// to give you a better idea.
 type service struct {  
-    repo IRepository
+    repo Repository
+    vesselClient vesselProto.VesselServiceClient
 }
-// CreateConsignment - 目前只创建了这个方法，包括 `ctx` (环境信息)和 `req`(委托请求)两个参数，会通过 gRPC 服务器进行处理
-func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment) (*pb.Response, error) {
-    // 保存委托
+
+// CreateConsignment - we created just one method on our service,
+// which is a create method, which takes a context and a request as an
+// argument, these are handled by the gRPC server.
+func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment, res *pb.Response) error {
+    // Here we call a client instance of our vessel service with our consignment weight,
+    // and the amount of containers as the capacity value
+    vesselResponse, err := s.vesselClient.FindAvailable(context.Background(), &vesselProto.Specification{
+        MaxWeight: req.Weight,
+        Capacity: int32(len(req.Containers)),
+    })
+    log.Printf("Found vessel: %s \n", vesselResponse.Vessel.Name)
+    if err != nil {
+        return err
+    }
+    // We set the VesselId as the vessel we got back from our
+    // vessel service
+    req.VesselId = vesselResponse.Vessel.Id
+    // Save our consignment
     consignment, err := s.repo.Create(req)
     if err != nil {
-        return nil, err
+        return err
     }
-    // 返回和 protobuf 中定义匹配的 `Response` 消息
-    return &pb.Response{Created: true, Consignment: consignment}, nil
+    // Return matching the `Response` message we created in our
+    // protobuf definition.
+    res.Created = true
+    res.Consignment = consignment
+    return nil
 }
 
-func (s *service) GetConsignments(ctx context.Context, req *pb.GetRequest) (*pb.Response, error) {  
+func (s *service) GetConsignments(ctx context.Context, req *pb.GetRequest, res *pb.Response) error {  
     consignments := s.repo.GetAll()
-    return &pb.Response{Consignments: consignments}, nil
+    res.Consignments = consignments
+    return nil
 }
-    
+
 func main() {
 
-    repo := &Repository{}
-    // 启动 gRPC 服务器。
-    lis, err := net.Listen("tcp", port)
-    if err != nil {
-        log.Fatalf("failed to listen: %v", err)
-    }
-    s := grpc.NewServer()
-    // 注册服务到 gRPC 服务器，会把已定义的 protobuf 与自动生成的代码接口进行绑定。
-    pb.RegisterShippingServiceServer(s, &service{repo})
-    // 在 gRPC 服务器上注册 reflection 服务。
-    reflection.Register(s)
-    if err := s.Serve(lis); err != nil {
-        log.Fatalf("failed to serve: %v", err)
+    repo := &ConsignmentRepository{}
+    // Create a new service. Optionally include some options here.
+    srv := micro.NewService(
+        // This name must match the package name given in your protobuf definition
+        micro.Name("go.micro.srv.consignment"),
+        micro.Version("latest"),
+    )
+
+    vesselClient := vesselProto.NewVesselServiceClient("go.micro.srv.vessel", srv.Client())
+    // Init will parse the command line flags.
+    srv.Init()
+    // Register handler
+    pb.RegisterShippingServiceHandler(srv.Server(), &service{repo, vesselClient})
+    // Run the server
+    if err := srv.Run(); err != nil {
+        fmt.Println(err)
     }
 }

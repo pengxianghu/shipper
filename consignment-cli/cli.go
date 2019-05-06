@@ -10,7 +10,8 @@ import (
 
     pb "github.com/pengxianghu/shipper/consignment-service/proto/consignment"
     "golang.org/x/net/context"
-    "google.golang.org/grpc"
+    "github.com/micro/go-micro/cmd"
+    microclient "github.com/micro/go-micro/client"
 )
 
 const (  
@@ -30,12 +31,9 @@ func parseFile(file string) (*pb.Consignment, error) {
 
 func main() {  
     // 创建和服务器的一个连接
-    conn, err := grpc.Dial(address, grpc.WithInsecure())
-    if err != nil {
-        log.Fatalf("Did not connect: %v", err)
-    }
-    defer conn.Close()
-    client := pb.NewShippingServiceClient(conn)
+    cmd.Init()
+    // Create new greeter client
+    client := pb.NewShippingServiceClient("go.micro.srv.consignment", microclient.DefaultClient)
     // 和服务器通信，并打印出返回信息
     file := defaultFilename
     if len(os.Args) > 1 {
