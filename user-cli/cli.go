@@ -50,10 +50,10 @@ func main() {
 			// password := c.String("password")
             // company := c.String("company")
             
-            name := "hu"
-			email := "123@163.com"
-			password := "hu"
-			company := "tec"
+            name := "hupxla"
+			email := "1525799@163.com"
+			password := "hupx"
+			company := "jd"
 
 			r, err := client.Create(context.TODO(), &pb.User{
 				Name: name,
