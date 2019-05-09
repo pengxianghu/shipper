@@ -1,66 +1,60 @@
 // vessel-service/main.go
 package main
 
-import (  
-    "context"
-    "errors"
-    "fmt"
+import (
+	"fmt"
+	"log"
 
-    pb "github.com/pengxianghu/shipper/vessel-service/proto/vessel"
-    "github.com/micro/go-micro"
+	pb "github.com/pengxianghu/shipper/vessel-service/proto/vessel"
+	"github.com/micro/go-micro"
+	"os"
 )
 
-type Repository interface {  
-    FindAvailable(*pb.Specification) (*pb.Vessel, error)
+
+const (
+	defaultHost = "localhost:27017"
+)
+
+func createDummyData(repo Repository) {
+	defer repo.Close()
+	vessels := []*pb.Vessel{
+		{Id: "vessel001", Name: "Kane's Salty Secret", MaxWeight: 200000, Capacity: 500},
+	}
+	for _, v := range vessels {
+		repo.Create(v)
+	}
 }
 
-type VesselRepository struct {  
-    vessels []*pb.Vessel
-}
+func main() {
 
-// FindAvailable - checks a specification against a map of vessels,
-// if capacity and max weight are below a vessels capacity and max weight,
-// then return that vessel.
-func (repo *VesselRepository) FindAvailable(spec *pb.Specification) (*pb.Vessel, error) {  
-    for _, vessel := range repo.vessels {
-        if spec.Capacity <= vessel.Capacity && spec.MaxWeight <= vessel.MaxWeight {
-            return vessel, nil
-        }
-    }
-    return nil, errors.New("No vessel found by that spec")
-}
+	host := os.Getenv("DB_HOST")
 
-// Our grpc service handler
-type service struct {  
-    repo Repository
-}
+	if host == "" {
+		host = defaultHost
+	}
 
-func (s *service) FindAvailable(ctx context.Context, req *pb.Specification, res *pb.Response) error {
-    // Find the next available vessel
-    vessel, err := s.repo.FindAvailable(req)
-    if err != nil {
-        return err
-    }
-    // Set the vessel as part of the response message type
-    res.Vessel = vessel
-    return nil
-}
+	session, err := CreateSession(host)
+	defer session.Close()
 
-func main() {  
-    vessels := []*pb.Vessel{
-        &pb.Vessel{Id: "vessel001", Name: "Kane's Salty Secret", MaxWeight: 200000, Capacity: 500},
-    }
-    repo := &VesselRepository{vessels}
+	if err != nil {
+		log.Fatalf("Error connecting to datastore: %v", err)
+	}
 
-    srv := micro.NewService(
-        micro.Name("go.micro.srv.vessel"),
-        micro.Version("latest"),
-    )
+	repo := &VesselRepository{session.Copy()}
 
-    srv.Init()
-    // Register our implementation with 
-    pb.RegisterVesselServiceHandler(srv.Server(), &service{repo})
-    if err := srv.Run(); err != nil {
-        fmt.Println(err)
-    }
+	createDummyData(repo)
+
+	srv := micro.NewService(
+		micro.Name("go.micro.srv.vessel"),
+		micro.Version("latest"),
+	)
+
+	srv.Init()
+
+	// Register our implementation with
+	pb.RegisterVesselServiceHandler(srv.Server(), &service{session})
+
+	if err := srv.Run(); err != nil {
+		fmt.Println(err)
+	}
 }
