@@ -1,0 +1,14 @@
+postgres
+用户名apple 数据库test_db 密码123456
+
+创建数据库
+createdb -Ouser_name -Eutf8 db_name
+
+psql -h host -U db -p port
+
+mongo
+mongo --host hostAddr --port 27017
+
+show dbs;
+use db1;
+db.tb1.find();
