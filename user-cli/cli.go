@@ -1,18 +1,19 @@
+// shippy-user-cli/cli.go
 package main
 
 import (
-	"log"
+    "log"
+    "os"
 
-	pb "github.com/pengxianghu/shipper/user-service/proto/user"
-	microclient "github.com/micro/go-micro/client"
-	"golang.org/x/net/context"
-	"github.com/micro/go-micro"
+    pb "github.com/pengxianghu/shipper/user-service/proto/user"
+    micro "github.com/micro/go-micro"
+    microclient "github.com/micro/go-micro/client"
+    "golang.org/x/net/context"
 )
-
 
 func main() {
 
-	srv := micro.NewService(
+    srv := micro.NewService(
 
         micro.Name("go.micro.srv.user-cli"),
         micro.Version("latest"),
@@ -24,9 +25,9 @@ func main() {
     client := pb.NewUserServiceClient("go.micro.srv.user", microclient.DefaultClient)
 
     name := "hupx"
-    email := "hpx@163.com"
-    password := "p"
-    company := "ali"
+    email := "hu@gmail.com"
+    password := "00000"
+    company := "ABC"
 
     r, err := client.Create(context.TODO(), &pb.User{
         Name:     name,
@@ -36,6 +37,7 @@ func main() {
     })
     if err != nil {
         log.Fatalf("Could not create: %v", err)
+        return 
     }
     log.Printf("Created: %s", r.User.Id)
 
@@ -45,7 +47,19 @@ func main() {
     }
     for _, v := range getAll.Users {
         log.Println(v)
-	}
-	
+    }
 
+    authResponse, err := client.Auth(context.TODO(), &pb.User{
+        Email:    email,
+        Password: password,
+    })
+
+    if err != nil {
+        log.Fatalf("Could not authenticate user: %s error: %v\n", email, err)
+    }
+
+    log.Printf("Your access token is: %s \n", authResponse.Token)
+
+    // let's just exit because
+    os.Exit(0)
 }

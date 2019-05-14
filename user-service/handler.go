@@ -3,8 +3,10 @@ package main
 
 import (
     "log"
+    "errors"
     "golang.org/x/net/context"
     pb "github.com/pengxianghu/shipper/user-service/proto/user"
+    "golang.org/x/crypto/bcrypt"
 )
 
 type service struct {
@@ -31,16 +33,35 @@ func (srv *service) GetAll(ctx context.Context, req *pb.Request, res *pb.Respons
 }
 
 func (srv *service) Auth(ctx context.Context, req *pb.User, res *pb.Token) error {
-    _, err := srv.repo.GetByEmailAndPassword(req)
+    log.Println("Logging in with:", req.Email, req.Password)
+    var reqP string = req.Password
+    user, err := srv.repo.GetByEmailAndPassword(req)
     if err != nil {
         return err
     }
-    res.Token = "testingabc"
+
+    // Compares our given password against the hashed password
+    // stored in the database
+    if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(reqP)); err != nil {
+        return err
+    }
+
+    token, err := srv.tokenService.Encode(user)
+    if err != nil {
+        return err
+    }
+    res.Token = token
     return nil
 }
 
 func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.Response) error {
-    log.Printf("handler user: %+v", req)
+    // Generates a hashed version of our password
+    hashedPass, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+    if err != nil {
+        return err
+    }
+
+    req.Password = string(hashedPass)
     if err := srv.repo.Create(req); err != nil {
         return err
     }
@@ -49,5 +70,20 @@ func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.Response) 
 }
 
 func (srv *service) ValidateToken(ctx context.Context, req *pb.Token, res *pb.Token) error {
-    return nil
+
+    // Decode token
+	claims, err := srv.tokenService.Decode(req.Token)
+	if err != nil {
+		return err
+	}
+
+	log.Println(claims)
+
+	if claims.User.Id == "" {
+		return errors.New("invalid user")
+	}
+
+	res.Valid = true
+
+	return nil
 }

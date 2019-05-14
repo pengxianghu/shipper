@@ -2,7 +2,6 @@
 package main
 
 import (
-    "log"
     pb "github.com/pengxianghu/shipper/user-service/proto/user"
     "github.com/jinzhu/gorm"
 )
@@ -43,7 +42,6 @@ func (repo *UserRepository) GetByEmailAndPassword(user *pb.User) (*pb.User, erro
 }
 
 func (repo *UserRepository) Create(user *pb.User) error {
-    log.Printf("repo user: %+v", user)
     if err := repo.db.Create(user).Error; err != nil {
         return err
 	}
