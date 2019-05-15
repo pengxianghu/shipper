@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"log"
-	pb "github.com/pengxianghu/shipper/user-service/proto/user"
 	"github.com/micro/go-micro"
+	pb "github.com/pengxianghu/shipper/user-service/proto/user"
+	"log"
 )
 
 func main() {

@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"log"
 
-	pb "github.com/pengxianghu/shipper/vessel-service/proto/vessel"
 	"github.com/micro/go-micro"
+	pb "github.com/pengxianghu/shipper/vessel-service/proto/vessel"
 	"os"
 )
-
 
 const (
 	defaultHost = "localhost:27017"

@@ -6,14 +6,13 @@ import (
 	pb "github.com/pengxianghu/shipper/consignment-service/proto/consignment"
 	vesselProto "github.com/pengxianghu/shipper/vessel-service/proto/vessel"
 	"golang.org/x/net/context"
-	"log"
 	"gopkg.in/mgo.v2"
-
+	"log"
 )
 
 // Service 应该实现我们在 protobuf 定义中定义的所有方法，检查生成的代码本身中是否有确切的签名方法等可以帮助你确认该 Service 是否实现了 protobuf 的所有定义。
 type service struct {
-	session *mgo.Session
+	session      *mgo.Session
 	vesselClient vesselProto.VesselServiceClient
 }
 
