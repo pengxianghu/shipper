@@ -1,0 +1,6 @@
+gRPC
+由一个Google开发、基于RPC通信、轻量级的二进制传输协议。
+gRPC核心数据格式采用二进制，RESTFul采用JSON格式。
+
+二进制数据交由protobuf处理（数字模拟语言）
+调用protoc将protobuf编译成对应代码
