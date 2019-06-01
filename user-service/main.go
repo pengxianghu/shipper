@@ -5,6 +5,7 @@ import (
 	"github.com/micro/go-micro"
 	pb "github.com/pengxianghu/shipper/user-service/proto/user"
 	"log"
+	// k8s "github.com/micro/kubernetes/go/micro"
 )
 
 func main() {

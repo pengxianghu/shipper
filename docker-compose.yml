@@ -31,54 +31,75 @@ services:
 #   networks: 
 #    - my-bridge
 
- database:
-  image: postgres
-  ports:
-   - 5432:5432
-  environment:
-   POSTGRES_DB: "postgres"
-   POSTGRES_USER: "postgres"
-   POSTGRES_PASSWORD: "postgres"
-  networks:
-   - my-bridge
+#  database:
+#   image: postgres
+#   ports:
+#    - 5432:5432
+#   environment:
+#    POSTGRES_DB: "postgres"
+#    POSTGRES_USER: "postgres"
+#    POSTGRES_PASSWORD: "postgres"
+#   networks:
+#    - my-bridge
 
- user-service:
-  build: ./user-service
-  ports:
-   - 50053:50051
-  environment:
-   MICRO_ADDRESS: ":50051"
-   MICRO_REGISTRY: "mdns"
-   DB_NAME: "postgres"
-   DB_HOST: "database"
-   DB_PORT: "5432"
-   DB_USER: "postgres"
-   DB_PASSWORD: "postgres"
-  networks:
-   - my-bridge
+#  user-service:
+#   build: ./user-service
+#   ports:
+#    - 50053:50051
+#   environment:
+#    MICRO_ADDRESS: ":50051"
+#    MICRO_REGISTRY: "mdns"
+#    DB_NAME: "postgres"
+#    DB_HOST: "database"
+#    DB_PORT: "5432"
+#    DB_USER: "postgres"
+#    DB_PASSWORD: "postgres"
+#   networks:
+#    - my-bridge
 
- user-cli: 
-  build: ./user-cli
-  environment:
-   MICRO_REGISTRY: "mdns"
-  networks: 
-   - my-bridge
+#  user-cli: 
+#   build: ./user-cli
+#   environment:
+#    MICRO_REGISTRY: "mdns"
+#   networks: 
+#    - my-bridge
  
- email-service:
-  build: ./email-service
-  environment:
-   MICRO_SERVER_ADDRESS: ":50054"
-   MICRO_REGISTRY: "mdns"
-  networks: 
-   - my-bridge
+#  email-service:
+#   build: ./email-service
+#   ports:
+#    - 50054:50051
+#   environment:
+#    MICRO_ADDRESS: ":50051"
+#    MICRO_REGISTRY: "mdns"
+#   networks: 
+#    - my-bridge
 
- datastore:
-  image: mongo
+#  datastore:
+#   image: mongo
+#   ports:
+#    - 27017:27017
+#   networks: 
+#    - my-bridge
+
+#  micro:
+#   image: microhq/micro
+#   ports:
+#    - 8080:8080
+#   environment:
+#    MICRO_REGISTRY: "mdns"
+#   command: api --handler=rpc --address=:8080 --namespace=shipper
+#   networks: 
+#    - my-bridge
+  
+ nginx:
+  image: nginx
   ports:
-   - 27017:27017
-  networks: 
-   - my-bridge
+   - "8070:80"
+  volumes:
+   - ./nginx-proxy/nginx.conf:/etc/nginx/conf.d/default.conf
+   - ./nginx-proxy/build:/usr/share/nginx/html
+  # command: /bin/bash -c "nginx -g 'daemon off;'"
 
-networks:
- my-bridge:
-  driver: bridge
+# networks:
+#  my-bridge:
+#   driver: bridge
