@@ -32,11 +32,13 @@ class Authenticate extends React.Component {
         })
         .then(res => res.javascripton())
         .then(res => {
+            console.log(res);
             this.props.onAuth(res.token);
             this.setState({
                 token: res.token,
                 authenticated: true,
             });
+            localStorage.setItem('token', res.token);
         })
         .catch(err => this.setState({ err, authenticated: false, }));
     }
@@ -59,12 +61,13 @@ class Authenticate extends React.Component {
         })
         .then((res) => res.javascripton())
         .then((res) => {
-            this.props.onAuth(res.token.token);
+            console.log(res);
+            this.props.onAuth(res.token);
             this.setState({
-                token: res.token.token,
+                // token: res.token.token,
                 authenticated: true,
             });
-            localStorage.setItem('token', res.token.token);
+            // localStorage.setItem('token', res.token.token);
         })
         .catch(err => this.setState({ err, authenticated: false, }));
     }
