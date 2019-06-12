@@ -111,7 +111,6 @@ class CreateConsignment extends React.Component {
                         <hr />
                         {consignments.map((item) => (
                             <div>
-                                <p>Vessel id: {item.vessel_id}</p>
                                 <p>Description: {item.description}</p>
                                 <p>Weight: {item.weight}</p>
                                 <hr />
