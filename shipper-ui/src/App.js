@@ -29,7 +29,7 @@ class App extends Component {
     }
 
     getToken = () => {
-        return localStorage.getItem('token') || false;
+        return sessionStorage.getItem('token') || false;
     }
 
     isAuthenticated = () => {
@@ -37,11 +37,11 @@ class App extends Component {
     }
 
     render() {
-        const authenticated = this.isAuthenticated();
+        var authenticated = this.isAuthenticated();
         return (
             <div className="App">
                 <div className="App-header">
-                    <h2>Shippy</h2>
+                    <h2>Shipper</h2>
                 </div>
                 <div className='App-intro container'>
                     {(authenticated ? this.renderAuthenticated() : this.renderLogin())}

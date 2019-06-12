@@ -61,8 +61,6 @@ func (srv *service) Auth(ctx context.Context, req *pb.User, res *pb.Token) error
 
 func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.Response) error {
 	// Generates a hashed version of our password
-	log.Println("--------in handler--------")
-	log.Printf("req user1: %+v", req)
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -73,7 +71,6 @@ func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.Response) 
 		return err
 	}
 	res.User = req
-	log.Printf("req user2: %+v", req)
 	
 	if err := srv.Publisher.Publish(ctx, req); err != nil {
         return err

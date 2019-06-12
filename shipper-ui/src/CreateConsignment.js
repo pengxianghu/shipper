@@ -3,9 +3,10 @@ import _ from 'lodash';
 
 class CreateConsignment extends React.Component {
 
-    // constructor(props) {
-    //     super(props);
-    // }
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
 
     state = {
         created: false,
@@ -16,19 +17,22 @@ class CreateConsignment extends React.Component {
     }
 
     componentWillMount() {
+        const token = sessionStorage.getItem('token');
         fetch(`http://www.pengxianghu.com/rpc`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({
                 service: 'go.micro.srv.consignment',
-                method: 'ConsignmentService.Get',
+                method: 'ConsignmentService.GetConsignments',
                 request: {},
             })
         })
-        .then(req => req.javascripton())
+        .then(req => req.json())
         .then((res) => {
+            console.log("create consignment component mount: " + res);
             this.setState({
                 consignments: res.consignments,
             });
@@ -37,18 +41,20 @@ class CreateConsignment extends React.Component {
 
     create = () => {
         const consignment = this.state;
+        const token = sessionStorage.getItem('token');
         fetch(`http://www.pengxianghu.com/rpc`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({
                 service: 'go.micro.srv.consignment',
-                method: 'ConsignmentService.Create',
+                method: 'ConsignmentService.CreateConsignment',
                 request: _.omit(consignment, 'created', 'consignments'),
             }),
         })
-        .then((res) => res.javascripton())
+        .then((res) => res.json())
         .then((res) => {
             this.setState({
                 created: res.created,
