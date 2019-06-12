@@ -26,7 +26,7 @@ class CreateConsignment extends React.Component {
             },
             body: JSON.stringify({
                 service: 'go.micro.srv.consignment',
-                method: 'ShippingService.GetConsignments',
+                method: 'ConsignmentService.GetConsignments',
                 request: {},
             })
         })
@@ -50,7 +50,7 @@ class CreateConsignment extends React.Component {
             },
             body: JSON.stringify({
                 service: 'go.micro.srv.consignment',
-                method: 'ShippingService.CreateConsignment',
+                method: 'ConsignmentService.CreateConsignment',
                 request: _.omit(consignment, 'created', 'consignments'),
             }),
         })

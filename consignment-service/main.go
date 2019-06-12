@@ -50,7 +50,7 @@ func main() {
 	srv.Init()
 
 	// 注册 handler
-	pb.RegisterShippingServiceHandler(srv.Server(), &service{session, vesselClient})
+	pb.RegisterConsignmentServiceHandler(srv.Server(), &service{session, vesselClient})
 
 	if err := srv.Run(); err != nil {
 		fmt.Println(err)

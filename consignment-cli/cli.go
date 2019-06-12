@@ -34,7 +34,7 @@ func main() {
 	cmd.Init()
 
 	// create a new client
-	client := pb.NewShippingServiceClient("go.micro.srv.consignment", microclient.DefaultClient)
+	client := pb.NewConsignmentServiceClient("go.micro.srv.consignment", microclient.DefaultClient)
 
 	file := defaultFilename
 	token := defaultToken

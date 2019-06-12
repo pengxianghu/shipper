@@ -4,7 +4,7 @@ syntax = "proto3";
 
 package go.micro.srv.consignment; 
 
-service ShippingService {  
+service ConsignmentService {  
   rpc CreateConsignment(Consignment)returns (Response) {}
 
   // 创建一个新方法
