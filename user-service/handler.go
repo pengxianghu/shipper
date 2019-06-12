@@ -40,7 +40,7 @@ func (srv *service) Auth(ctx context.Context, req *pb.User, res *pb.Token) error
 	var reqP string = req.Password
 	log.Printf("input user: %+v", req)
 	user, err := srv.repo.GetByEmailAndPassword(req)
-	log.Printf("gotuser: %+v", user)
+	log.Printf("got user: %+v", user)
 	if err != nil {
 		return err
 	}

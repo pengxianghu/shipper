@@ -35,7 +35,7 @@ func (repo *UserRepository) Get(id string) (*pb.User, error) {
 }
 
 func (repo *UserRepository) GetByEmailAndPassword(user *pb.User) (*pb.User, error) {
-	if err := repo.db.First(&user).Error; err != nil {
+	if err := repo.db.Where("email = ?", user.Email).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
