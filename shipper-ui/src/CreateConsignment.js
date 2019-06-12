@@ -30,13 +30,13 @@ class CreateConsignment extends React.Component {
                 request: {},
             })
         })
-        .then(req => req.json())
-        .then((res) => {
-            console.log("create consignment component mount: " + res);
-            this.setState({
-                consignments: res.consignments,
+            .then(req => req.json())
+            .then((res) => {
+                console.log("create consignment component mount: " + res);
+                this.setState({
+                    consignments: res.consignments,
+                });
             });
-        });
     }
 
     create = () => {
@@ -54,13 +54,20 @@ class CreateConsignment extends React.Component {
                 request: _.omit(consignment, 'created', 'consignments'),
             }),
         })
-        .then((res) => res.json())
-        .then((res) => {
-            this.setState({
-                created: res.created,
-                consignments: [...this.state.consignments, consignment],
+            .then((res) => res.json())
+            .then((res) => {
+                if (this.state.consignments.length == 0) {
+                    this.setState({
+                        created: res.created,
+                        consignments: [consignment],
+                    });
+                } else {
+                    this.setState({
+                        created: res.created,
+                        consignments: [...this.state.consignments, consignment],
+                    });
+                }
             });
-        });
     }
 
     addContainer = e => {
@@ -93,27 +100,24 @@ class CreateConsignment extends React.Component {
                     <div className='form-group'>
                         <input onChange={this.setWeight} type='number' placeholder='Weight' className='form-control' />
                     </div>
-                    <div className='form-control'>
-                        Add containers...
-                    </div>
                     <br />
-                    <button onClick={this.create} className='btn btn-primary'>Create</button>
+                    <button onClick={this.create} className='btn btn-primary'>添加</button>
                     <br />
                     <hr />
                 </div>
                 {(consignments && consignments.length > 0
                     ? <div className='consignment-list'>
-                            <h2>Consignments</h2>
-                            {consignments.map((item) => (
-                                <div>
-                                    <p>Vessel id: {item.vessel_id}</p>
-                                    <p>Consignment id: {item.id}</p>
-                                    <p>Description: {item.description}</p>
-                                    <p>Weight: {item.weight}</p>
-                                    <hr />
-                                </div>
-                            ))}
-                        </div>
+                        <h2>Consignments</h2>
+                        <hr />
+                        {consignments.map((item) => (
+                            <div>
+                                <p>Vessel id: {item.vessel_id}</p>
+                                <p>Description: {item.description}</p>
+                                <p>Weight: {item.weight}</p>
+                                <hr />
+                            </div>
+                        ))}
+                    </div>
                     : false)}
             </div>
         );

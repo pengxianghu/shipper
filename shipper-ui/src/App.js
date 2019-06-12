@@ -41,7 +41,7 @@ class App extends Component {
         return (
             <div className="App">
                 <div className="App-header">
-                    <h2>Shipper</h2>
+                    <h2>Shipper Golang Micro-Service</h2>
                 </div>
                 <div className='App-intro container'>
                     {(authenticated ? this.renderAuthenticated() : this.renderLogin())}
