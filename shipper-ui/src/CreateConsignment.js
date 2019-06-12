@@ -22,7 +22,7 @@ class CreateConsignment extends React.Component {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                'Authorization': token,
             },
             body: JSON.stringify({
                 service: 'go.micro.srv.consignment',
@@ -46,7 +46,7 @@ class CreateConsignment extends React.Component {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                'Authorization': token,
             },
             body: JSON.stringify({
                 service: 'go.micro.srv.consignment',
