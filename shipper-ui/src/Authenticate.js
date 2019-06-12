@@ -23,12 +23,12 @@ class Authenticate extends React.Component {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
+                service: 'go.micro.srv.user',
+                method: 'UserService.Auth',
                 request: {
                     email: this.state.email,
                     password: this.state.password,
                 },
-                service: 'go.micro.srv.user',
-                method: 'UserService.Auth',
             }),
         })
             .then(res => res.json())
@@ -58,13 +58,13 @@ class Authenticate extends React.Component {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
+                service: 'go.micro.srv.user',
+                method: 'UserService.Create',
                 request: {
                     email: this.state.email,
                     password: this.state.password,
                     name: this.state.name,
                 },
-                service: 'go.micro.srv.user',
-                method: 'UserService.Create',
             }),
         })
             .then((res) => res.json())
