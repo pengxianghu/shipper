@@ -34,6 +34,10 @@ class Authenticate extends React.Component {
             .then(res => res.json())
             .then(data => {
                 // console.log(data);
+                if (data.token === undefined) {
+                    console.log("auth failed!");
+                    return 
+                }
                 this.setState({
                     token: data.token,
                     authenticated: true,
@@ -42,12 +46,6 @@ class Authenticate extends React.Component {
                 this.props.onAuth(data.token);
             })
             .catch(err => this.setState({ err, authenticated: false, }));
-
-        // let res = '{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VyIjp7ImlkIjoiNjY0ODNmZjYtOWVhMC00M2UwLThiNmYtMzQyYTJlM2I3OTUwIiwibmFtZSI6ImhlbnJ5IiwiZW1haWwiOiJoZW5yeSIsInBhc3N3b3JkIjoiJDJhJDEwJEd2YXpqSDZwelE1N3M1ZHZhb2ZvTU9LMGsuV3lQNjhsdTJYaFRsWnhRN3ZqMDhrMmUzOWlTIn0sImV4cCI6MTU2MDQxNDA3MiwiaXNzIjoiZ28ubWljcm8uc3J2LnVzZXIifQ.eqZKQm0oi2XA8OpHhk4-_E59mekjmSVZC41gnrtAiHs"}';
-
-        // let obj = JSON.parse(res);
-        // window.localStorage.setItem('token', obj.token);
-        // this.props.onAuth();
 
     }
 

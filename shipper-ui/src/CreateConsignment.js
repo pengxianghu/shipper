@@ -56,7 +56,7 @@ class CreateConsignment extends React.Component {
         })
             .then((res) => res.json())
             .then((res) => {
-                if (this.state.consignments.length == 0) {
+                if (this.state.consignments === undefined ) {
                     this.setState({
                         created: res.created,
                         consignments: [consignment],
